@@ -1,0 +1,119 @@
+<mujoco model="vta_f1_scene">
+  <!--
+    Plantilla de escena F1 (Visión→Acción / ATLAS).
+
+    NO es MJCF válido por sí solo: los valores entre llaves los completa
+    src/vta/envs/scene_builder.py al generar cada escena. El XML generado se
+    escribe en data/scenes/<scene_id>/scene.xml y se carga con
+    mujoco.MjModel.from_xml_path (data/ está fuera de git).
+
+    Layout (unidades SI; mundo = base del robot):
+      - Panda montado sobre la mesa en (0, 0, 0.40) mirando hacia +x
+        (attach del asset prístino de menagerie; prefijo de nombres "panda_").
+      - Mesa estática: superficie en z=0.40 (tapa + 4 patas).
+      - Taza objetivo: cilindro hueco aleatorizado en el workspace (una sola).
+      - Cajas A (izquierda, -y) y B (derecha, +y): 5 geoms estáticos cada una.
+      - Luces key/fill parametrizables (randomización de iluminación).
+      - cam_scene (tercera persona) y cam_top, ambas apuntando a un cuerpo
+        estático "cam_scene_target" (targetbody) fijo en el workspace.
+  -->
+
+  <compiler angle="radian"/>
+  <!-- implicitfast: el Panda de menagerie está tuneado para este integrador;
+       hay que declararlo en el padre para que el attach no lo pise con el
+       default (el attach conserva el valor del padre ante conflictos). -->
+  <option integrator="implicitfast"/>
+
+  <statistic center="0.25 0 0.5" extent="0.9"/>
+
+  <visual>
+    <headlight diffuse="0.55 0.55 0.55" ambient="0.35 0.35 0.35" specular="0 0 0"/>
+    <quality shadowsize="2048"/>
+    <rgba haze="0.15 0.17 0.20 1"/>
+  </visual>
+
+  <asset>
+    <!-- Robot prístino de menagerie (no editar): se monta vía attach. -->
+    <model name="panda" file="{panda_xml}"/>
+
+    <texture type="skybox" builtin="gradient" rgb1="0.55 0.65 0.75" rgb2="0.07 0.09 0.12"
+             width="512" height="3072"/>
+    <texture name="floor_tex" type="2d" builtin="checker" rgb1="0.76 0.76 0.79" rgb2="0.70 0.70 0.74"
+             width="300" height="300"/>
+
+    <material name="mat_floor" texture="floor_tex" texuniform="true" texrepeat="10 10" reflectance="0.05"/>
+    <material name="mat_table" rgba="0.87 0.84 0.79 1" specular="0.2" shininess="0.2"/>
+    <material name="mat_table_leg" rgba="0.50 0.47 0.44 1" specular="0.1" shininess="0.1"/>
+    <material name="mat_box" rgba="0.70 0.72 0.78 1" specular="0.15" shininess="0.15"/>
+
+    <!-- Paleta de tazas: entrenamiento (rojo/azul) + OOD (verde/amarillo). -->
+    <material name="mat_cup_red"    rgba="0.78 0.12 0.12 1" specular="0.4" shininess="0.35"/>
+    <material name="mat_cup_blue"   rgba="0.15 0.30 0.78 1" specular="0.4" shininess="0.35"/>
+    <material name="mat_cup_green"  rgba="0.10 0.62 0.22 1" specular="0.4" shininess="0.35"/>
+    <material name="mat_cup_yellow" rgba="0.88 0.72 0.10 1" specular="0.4" shininess="0.35"/>
+    <material name="mat_cup_inside" rgba="0.09 0.09 0.10 1" specular="0.1" shininess="0.1"/>
+  </asset>
+
+  <worldbody>
+    <!-- Luces parametrizables. El robot agrega su propia luz "panda_top" (trackcom). -->
+    <light name="key" pos="{key_pos}" diffuse="{key_diffuse}" castshadow="true"/>
+    <light name="fill" pos="{fill_pos}" diffuse="{fill_diffuse}" castshadow="false"/>
+
+    <geom name="floor" type="plane" size="4 4 0.05" material="mat_floor"/>
+
+    <!-- Mesa estática: tapa + 4 patas. Superficie en z=0.40. -->
+    <geom name="table_top" type="box" pos="0.10 0 0.38" size="0.55 0.42 0.02" material="mat_table"/>
+    <geom name="table_leg_1" type="box" pos="0.60 0.37 0.18" size="0.025 0.025 0.18" material="mat_table_leg"/>
+    <geom name="table_leg_2" type="box" pos="0.60 -0.37 0.18" size="0.025 0.025 0.18" material="mat_table_leg"/>
+    <geom name="table_leg_3" type="box" pos="-0.40 0.37 0.18" size="0.025 0.025 0.18" material="mat_table_leg"/>
+    <geom name="table_leg_4" type="box" pos="-0.40 -0.37 0.18" size="0.025 0.025 0.18" material="mat_table_leg"/>
+
+    <!-- Caja A (izquierda, -y): interior 0.11 x 0.11, paredes de 0.07 de alto. -->
+    <body name="box_a" pos="0.45 -0.32 0.40">
+      <geom name="box_a_floor"    type="box" pos="0 0 0.005"      size="0.065 0.065 0.005" material="mat_box"/>
+      <geom name="box_a_wall_xm"  type="box" pos="-0.06 0 0.035"  size="0.005 0.065 0.035" material="mat_box"/>
+      <geom name="box_a_wall_xp"  type="box" pos="0.06 0 0.035"   size="0.005 0.065 0.035" material="mat_box"/>
+      <geom name="box_a_wall_ym"  type="box" pos="0 -0.06 0.035"  size="0.055 0.005 0.035" material="mat_box"/>
+      <geom name="box_a_wall_yp"  type="box" pos="0 0.06 0.035"   size="0.055 0.005 0.035" material="mat_box"/>
+    </body>
+
+    <!-- Caja B (derecha, +y). -->
+    <body name="box_b" pos="0.45 0.32 0.40">
+      <geom name="box_b_floor"    type="box" pos="0 0 0.005"      size="0.065 0.065 0.005" material="mat_box"/>
+      <geom name="box_b_wall_xm"  type="box" pos="-0.06 0 0.035"  size="0.005 0.065 0.035" material="mat_box"/>
+      <geom name="box_b_wall_xp"  type="box" pos="0.06 0 0.035"   size="0.005 0.065 0.035" material="mat_box"/>
+      <geom name="box_b_wall_ym"  type="box" pos="0 -0.06 0.035"  size="0.055 0.005 0.035" material="mat_box"/>
+      <geom name="box_b_wall_yp"  type="box" pos="0 0.06 0.035"   size="0.055 0.005 0.035" material="mat_box"/>
+    </body>
+
+    <!-- Robot: mount estático a la altura de la mesa + attach del panda prístino. -->
+    <body name="robot_mount" pos="0 0 0.40">
+      <attach model="panda" body="link0" prefix="panda_"/>
+    </body>
+
+    <!-- Taza objetivo (única). Colisión: cilindro sólido; visual: hueca.
+         El cilindro interior oscuro, hundido bajo el borde, da el aspecto hueco. -->
+    <body name="cup" pos="{cup_pos}" quat="{cup_quat}">
+      <freejoint name="cup_joint"/>
+      <geom name="cup_collision" type="cylinder" size="{cup_geom_size}" density="{cup_density}" group="3"/>
+      <geom name="cup_visual" type="cylinder" size="{cup_geom_size}" material="{cup_material}"
+            contype="0" conaffinity="0" group="2"/>
+      <geom name="cup_visual_inner" type="cylinder" pos="0 0 {cup_inner_z}" size="{cup_inner_size}"
+            material="mat_cup_inside" contype="0" conaffinity="0" group="2"/>
+    </body>
+
+    <!-- Punto de mira fijo e invisible de las cámaras (cuerpo estático). -->
+    <body name="cam_scene_target" pos="0.25 0 0.60">
+      <geom name="cam_scene_target_geom" type="sphere" size="0.004" rgba="0 0 0 0"
+            contype="0" conaffinity="0" group="5"/>
+    </body>
+
+    <camera name="cam_scene" pos="{cam_scene_pos}" mode="targetbody" target="cam_scene_target" fovy="45"/>
+    <camera name="cam_top" pos="{cam_top_pos}" mode="targetbody" target="cam_scene_target" fovy="45"/>
+  </worldbody>
+
+  <!-- Estado inicial: pose "ready" del brazo + taza en su spawn (los completa el builder). -->
+  <keyframe>
+    <key name="init" qpos="{init_qpos}" ctrl="{init_ctrl}"/>
+  </keyframe>
+</mujoco>
