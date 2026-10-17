@@ -92,14 +92,27 @@
     </body>
 
     <!-- Taza objetivo (única). Colisión: cilindro sólido; visual: hueca.
-         El cilindro interior oscuro, hundido bajo el borde, da el aspecto hueco. -->
+         El cilindro interior oscuro, hundido bajo el borde, da el aspecto hueco.
+         Los geoms visuales llevan mass="0": la masa sale SOLO del geom de
+         colisión (densidad de la config). Sin esto, MuJoCo les asigna su
+         densidad default (1000) y la taza pesa ~10× lo esperado.
+         El geom de colisión usa priority="2" (sus parámetros de contacto ganan)
+         con contactos más rígidos (solref) y fricción alta: sin esto el gripper
+         sobre-cierra sobre la taza blanda y la cuña de los dedos la clava en la
+         mesa (ver F2 en reports/experiments.md).
+         condim="6" + fricción torsional 0.3: los pads del Panda son cajas chicas
+         (6x4x6 mm) y la taza apoyaba sobre sus esquinas; con condim=3 (sin
+         resistencia torsional) la copa "rodaba" microscópicamente por las caras
+         (10 mm/s: caminata espontánea que la expulsaba del agarre en el lift).
+         La torsional la ancla (ver F2: kick-test en reports/experiments.md). -->
     <body name="cup" pos="{cup_pos}" quat="{cup_quat}">
       <freejoint name="cup_joint"/>
-      <geom name="cup_collision" type="cylinder" size="{cup_geom_size}" density="{cup_density}" group="3"/>
+      <geom name="cup_collision" type="cylinder" size="{cup_geom_size}" density="{cup_density}" group="3"
+            priority="2" condim="6" friction="1.5 0.3 0.001" solref="0.008 1" solimp="0.95 0.99 0.001"/>
       <geom name="cup_visual" type="cylinder" size="{cup_geom_size}" material="{cup_material}"
-            contype="0" conaffinity="0" group="2"/>
+            contype="0" conaffinity="0" group="2" mass="0"/>
       <geom name="cup_visual_inner" type="cylinder" pos="0 0 {cup_inner_z}" size="{cup_inner_size}"
-            material="mat_cup_inside" contype="0" conaffinity="0" group="2"/>
+            material="mat_cup_inside" contype="0" conaffinity="0" group="2" mass="0"/>
     </body>
 
     <!-- Punto de mira fijo e invisible de las cámaras (cuerpo estático). -->

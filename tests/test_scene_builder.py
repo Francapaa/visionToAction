@@ -65,6 +65,14 @@ def test_generated_scene_parses_with_expected_names(tmp_path) -> None:
     assert np.allclose(model.geom_size[gid][:2], (CONFIG.cup.radius, CONFIG.cup.half_height), atol=1e-9)
 
 
+def test_cup_mass_comes_from_collision_density(ref_model) -> None:
+    """Los geoms visuales no aportan masa: m = densidad × volumen del cilindro."""
+    cup_id = mujoco.mj_name2id(ref_model, mujoco.mjtObj.mjOBJ_BODY, sb.CUP_BODY_NAME)
+    volume = np.pi * CONFIG.cup.radius**2 * 2.0 * CONFIG.cup.half_height
+    expected = CONFIG.cup.density * volume
+    assert abs(ref_model.body_mass[cup_id] - expected) / expected < 0.01
+
+
 def test_spawn_bounds_and_clearances(ref_model) -> None:
     """200 seeds: la taza cae dentro del workspace y lejos de cajas/borde."""
     data = mujoco.MjData(ref_model)

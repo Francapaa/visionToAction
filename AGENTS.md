@@ -8,7 +8,8 @@
 
 - **F0 (setup)** — ✅ cerrada 2026-10-17: venv (Python 3.14) + deps + menagerie + render offscreen validado en Windows (WGL) → `reports/validation/f0_smoke.mp4`.
 - **F1 (escena)** — ✅ cerrada 2026-10-17: mesa + Panda montado vía `attach` + taza hueca + cajas A/B + cámaras + luces + randomización determinista + registro de contactos → 12 escenas + órbita en `reports/validation/f1/`; `pytest -m smoke` en verde.
-- **F2 (experto + dataset)** — próxima: controlador mink (acción 7D → juntas) + experto por waypoints + collector HDF5 (≥90% de éxito en 30 seeds/tarea).
+- **F2 (experto + dataset)** — ✅ cerrada 2026-10-17: controlador de espacio de tarea (mink, acción 7D → juntas) + experto por waypoints + collector HDF5; aceptación 30 seeds/tarea: **120/120 (100%)**; dataset v1: 360 episodios (90/tarea, seeds 30–119, todos `expert_success=1`) en `data/demos/v1/` + `index.jsonl` + videos de validación en `reports/validation/f2/`; fixes F2 (agarre `condim=6`, target del fondo en z mundo, workspace x≥0.28) documentados en `reports/experiments.md`.
+- **F3 (BC-state)** — próxima: baseline MLP (estado + task) → acción + evaluador + logging, pipeline reproducible con seeds fijas.
 - Actualizar esta sección al cerrar cada fase.
 
 ## 1. Qué es este proyecto
@@ -78,6 +79,7 @@ visionToAction/
   data/              # FUERA DE GIT: demos, exports
   checkpoints/       # FUERA DE GIT
   reports/           # runs.jsonl, eval/*.csv, videos chicos, experiments.md
+  bugs/              # registro de bugs: un .md por bug + índice (README)
 ```
 
 ## 5. Arquitectura técnica
@@ -86,7 +88,10 @@ visionToAction/
 - `scenes/base.xml`: mesa + Panda + luces parametrizables + cámaras `cam_scene`
   (tercera persona; render 320×240 → 84×84), `cam_top` (opcional), `cam_wrist` (F5+).
 - Taza: cilindro hueco, ~3.5 cm radio, ~8 cm alto; color por material
-  (`red/blue/green/yellow` + texturas OOD).
+  (`red/blue/green/yellow` + texturas OOD). El geom de colisión usa `condim=6` con
+  fricción torsional (0.3): los pads del Panda son cajas chicas (6×4×6 mm) y sin
+  torsional la copa "rueda" microscópicamente sobre sus esquinitas (creep de
+  ~10 mm/s que la expulsa del agarre en el lift; ver F2 en `reports/experiments.md`).
 - Cajas: 5 geoms (4 paredes + fondo) soldadas al mundo; caja **A** (izquierda), **B** (derecha).
 - Distractores: tazas/objetos extra (F5+).
 - `envs/scene_builder.py`: genera el XML paramétrico (spawn, colores, luces, distractores).
@@ -96,6 +101,9 @@ visionToAction/
 ### 5.2 Controlador (acción → juntas)
 - Interfaz compartida política/experto: acción **7D normalizada en [-1,1]**:
   Δpos(3) [máx 2 cm/step], Δrot(3) [tipo axis-angle, máx ~5°/step], gripper(1) [+ cierra].
+- Las acciones mueven un **target virtual persistente** (correa ≤2 cm respecto de la
+  pose real): acción cero mantiene la pose. Sin esto el sag del servo de posición se
+  acumulaba (test de regresión en `tests/test_controller.py`).
 - Frecuencia de control: **20 Hz** (decimando sim).
 - IK diferencial con **mink** (límites articulares; evitación de colisiones como constraint en F5+).
 - Determinista y testeado: test de convergencia IK a poses alcanzables.
@@ -117,9 +125,11 @@ visionToAction/
 - Plan B si no llega: SAC+HER (stable-baselines3) en la misma escena.
 
 ### 5.5 Dataset
-- HDF5 por episodio: `data/demos/v1/<split>/<task_id>/demo_000123.h5`
-  - grupos: `obs/image`, `obs/proprio`, `state/objects`, `actions`, `contacts`
+- HDF5 por episodio: `data/demos/<v>/train/<task_id>/demo_<seed6>.h5`
+  - grupos: `obs/image`, `obs/proprio`, `state/cup_pos`, `state/cup_quat`, `actions`, `contacts`
   - attrs: `task_id`, `seed`, `spawn`, `lighting`, `expert_success`
+- `data/demos/<v>/index.jsonl`: una línea JSON por episodio (resumen: ruta, éxito,
+  pasos, spawn, cup_final, fases). Los videos (`--videos N`) van a `<v>/videos/`.
 - Solo episodios con `expert_success=1` entran a entrenamiento.
 - **Splits de evaluación (idénticos para TODAS las políticas):**
   - G0 in-distribution · G1 posiciones OOD · G2 colores OOD (verde/amarillo) ·
@@ -146,6 +156,7 @@ visionToAction/
 ## 6. Convenciones
 
 - Conventional commits; commits chicos; tags `f0-done`, `f1-done`, ...
+- Todo bug con fix no trivial se documenta en `bugs/` (un `.md` por bug + índice).
 - **Nunca** commitear datos ni checkpoints (`.gitignore`: `data/`, `checkpoints/`, `*.h5`,
   `*.pt`, `*.zip`). Videos chicos para README solo en `reports/`.
 - Python con type hints; configs como dataclasses cargadas de YAML; `logging`, no `print`.
