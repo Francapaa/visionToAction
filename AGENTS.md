@@ -46,6 +46,7 @@ python -m venv .venv                                  # una sola vez
 .venv\Scripts\python.exe -m pip install -r requirements.txt
 .venv\Scripts\python.exe scripts\smoke_render.py      # F0: render offscreen + video
 .venv\Scripts\python.exe scripts\build_scene.py --random --seed 0   # escena → PNG
+.venv\Scripts\python.exe scripts\view_scene.py --random --seed 0    # viewer interactivo (R: nueva escena, espacio: pausa)
 .venv\Scripts\python.exe scripts\collect_demos.py --tasks red_a,red_b,blue_a,blue_b --n 80 --out data\demos\v1
 .venv\Scripts\python.exe -m pytest -m smoke           # tests rápidos (<60 s)
 .venv\Scripts\python.exe -m pytest                    # suite completa
@@ -63,7 +64,7 @@ visionToAction/
   assets/            # menagerie (subset Panda) — prístino
   scenes/            # plantillas MJCF + overlays propios
   configs/           # YAML por experimento
-  scripts/           # smoke_render, build_scene, collect_demos, train, evaluate, export_dataset
+  scripts/           # smoke_render, build_scene, view_scene, collect_demos, train, evaluate, export_dataset
   src/vta/
     envs/            # Env gymnasium, scene_builder (XML paramétrico), randomización
     controller/      # IK (mink) + mapeo acción normalizada → juntas

@@ -36,7 +36,6 @@ CONTROL_HZ = 20.0
 OBS_IMAGE_SIZE = 84
 RENDER_WIDTH = 320
 RENDER_HEIGHT = 240
-SETTLE_STEPS = 250
 PROPRIO_DIM = 22
 ACTION_DIM = 7
 
@@ -54,7 +53,7 @@ class PickPlaceEnv(gymnasium.Env):
         render_width: int = RENDER_WIDTH,
         render_height: int = RENDER_HEIGHT,
         obs_image_size: int = OBS_IMAGE_SIZE,
-        settle_steps: int = SETTLE_STEPS,
+        settle_steps: int = sb.DEFAULT_SETTLE_STEPS,
     ) -> None:
         super().__init__()
         self._config = config or sb.SceneConfig.from_yaml()
@@ -114,20 +113,13 @@ class PickPlaceEnv(gymnasium.Env):
             )
 
         self.scene_params = params
-        self.scene_path = sb.write_scene(params, config=self._config, out_dir=self._scene_dir)
+        self.scene_path = sb.scene_path_for(params, self._scene_dir)
 
-        self.model = mujoco.MjModel.from_xml_path(str(self.scene_path))
-        self.data = mujoco.MjData(self.model)
+        self.model, self.data = sb.load_scene(
+            params, config=self._config, out_dir=self._scene_dir, settle_steps=self._settle_steps
+        )
         self._resolve_indices()
         self._decimation = max(1, round(1.0 / (CONTROL_HZ * float(self.model.opt.timestep))))
-
-        key_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_KEY, sb.INIT_KEY_NAME)
-        if key_id < 0:
-            raise RuntimeError(f"La escena no tiene keyframe {sb.INIT_KEY_NAME!r}: {self.scene_path}")
-        mujoco.mj_resetDataKeyframe(self.model, self.data, key_id)
-        for _ in range(self._settle_steps):
-            mujoco.mj_step(self.model, self.data)
-        mujoco.mj_forward(self.model, self.data)
 
         if self._renderer is not None:
             self._renderer.close()

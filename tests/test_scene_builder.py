@@ -112,3 +112,20 @@ def test_invalid_color_and_box_raise() -> None:
         sb.sample_scene(0, target_box="c", config=CONFIG)
     with pytest.raises(ValueError):
         sb.default_scene(color="pink", config=CONFIG)
+
+
+def test_load_scene_applies_keyframe_and_settles(tmp_path) -> None:
+    """El camino compartido env/viewer: keyframe init aplicado + taza apoyada."""
+    params = sb.sample_scene(6, config=CONFIG)
+    model, data = sb.load_scene(params, config=CONFIG, out_dir=tmp_path, settle_steps=150)
+
+    # tolerancia 1e-2 rad: los actuadores ceden ~6 mrad bajo gravedad
+    assert np.allclose(data.qpos[:7], sb.INIT_ARM_QPOS, atol=1e-2)
+    assert np.allclose(data.qpos[7:9], sb.INIT_FINGER_QPOS, atol=1e-3)
+
+    cup_adr = model.jnt_qposadr[mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_JOINT, sb.CUP_JOINT_NAME)]
+    assert np.allclose(data.qpos[cup_adr:cup_adr + 2], params.cup_xyz[:2], atol=2e-4)
+    assert abs(data.qpos[cup_adr + 2] - (params.cup_xyz[2] - 0.001)) < 0.002
+
+    # el XML quedó escrito en la ruta canónica de out_dir
+    assert sb.scene_path_for(params, tmp_path).exists()

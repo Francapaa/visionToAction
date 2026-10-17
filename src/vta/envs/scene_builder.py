@@ -3,8 +3,8 @@
 Uso típico:
     config = SceneConfig.from_yaml()
     params = sample_scene(seed=0, color="red", target_box="a", config=config)
-    path   = write_scene(params, config=config)   # data/scenes/<scene_id>/scene.xml
-    model  = mujoco.MjModel.from_xml_path(str(path))
+    model, data = load_scene(params, config=config)  # + keyframe init + asentado
+    path        = scene_path_for(params)             # data/scenes/<scene_id>/scene.xml
 
 Garantías:
   - Determinismo: (seed, color, target_box) ⇒ SceneParams y XML byte a byte.
@@ -25,6 +25,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+import mujoco
 import numpy as np
 import yaml
 
@@ -35,6 +36,7 @@ TEMPLATE_PATH = ROOT / "scenes" / "base.xml"
 DEFAULT_CONFIG_PATH = ROOT / "configs" / "scene_f1.yaml"
 PANDA_XML_PATH = ROOT / "assets" / "mujoco_menagerie" / "franka_emika_panda" / "panda.xml"
 DEFAULT_SCENE_DIR = ROOT / "data" / "scenes"
+DEFAULT_SETTLE_STEPS = 250  # pasos de física para que la taza quede apoyada
 
 # --- Nombres del modelo (contrato con env.py, tests y el experto de F2) ---
 PANDA_PREFIX = "panda_"
@@ -316,6 +318,12 @@ def scene_id(params: SceneParams) -> str:
     return f"seed{params.seed:04d}_{params.cup_color}_box{params.target_box}"
 
 
+def scene_path_for(params: SceneParams, out_dir: Path | str | None = None) -> Path:
+    """Ruta donde vive (o vivirá) el XML de una escena."""
+    base = Path(out_dir) if out_dir is not None else DEFAULT_SCENE_DIR
+    return base / scene_id(params) / "scene.xml"
+
+
 def write_scene(
     params: SceneParams,
     *,
@@ -324,10 +332,33 @@ def write_scene(
 ) -> Path:
     """Escribe el XML generado (bytes determinísticos) y devuelve su ruta."""
     config = config or SceneConfig.from_yaml()
-    base = Path(out_dir) if out_dir is not None else DEFAULT_SCENE_DIR
-    scene_dir = base / scene_id(params)
-    scene_dir.mkdir(parents=True, exist_ok=True)
-    path = scene_dir / "scene.xml"
+    path = scene_path_for(params, out_dir)
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(build_scene_xml(params, config), encoding="utf-8", newline="\n")
     log.debug("escena escrita en %s", path)
     return path
+
+
+def load_scene(
+    params: SceneParams,
+    *,
+    config: SceneConfig | None = None,
+    out_dir: Path | str | None = None,
+    settle_steps: int = DEFAULT_SETTLE_STEPS,
+) -> tuple[mujoco.MjModel, mujoco.MjData]:
+    """Escribe la escena, la carga y la deja en el keyframe `init` (+ asentado).
+
+    Camino único de carga compartido por env, scripts de render y viewer: con
+    `settle_steps` pasos de física la taza queda apoyada en la mesa.
+    """
+    path = write_scene(params, config=config, out_dir=out_dir)
+    model = mujoco.MjModel.from_xml_path(str(path))
+    data = mujoco.MjData(model)
+    key_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_KEY, INIT_KEY_NAME)
+    if key_id < 0:
+        raise RuntimeError(f"La escena no tiene el keyframe {INIT_KEY_NAME!r}: {path}")
+    mujoco.mj_resetDataKeyframe(model, data, key_id)
+    for _ in range(settle_steps):
+        mujoco.mj_step(model, data)
+    mujoco.mj_forward(model, data)
+    return model, data
