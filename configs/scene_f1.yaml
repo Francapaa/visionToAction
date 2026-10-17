@@ -16,8 +16,12 @@ cup:
   spawn_gap: 0.001     # altura sobre la mesa al momento del spawn
 
 # Región de spawn de la taza (marco del mundo; la base del robot está en x=0).
+# x_min=0.28: el brazo con la muñeca hacia abajo no alcanza el bolsillo cercano
+# a la columna en y∈[-0.14,0] (x≤0.27: la correa del controlador se satura a
+# ~2 cm de la taza y el descenso nunca converge; grilla de alcance en
+# reports/experiments.md, F2).
 workspace:
-  x: [0.18, 0.52]
+  x: [0.28, 0.52]
   y: [-0.20, 0.20]
   yaw: [0.0, 6.283185307179586]
 

@@ -13,9 +13,8 @@ Notas de contrato:
   - `ee_*` = pose del cuerpo `panda_hand` (marco del hand de menagerie).
   - `gripper` = qpos[finger_joint1] + qpos[finger_joint2] (0=cerrado, 0.08=abierto).
 
-En F1 NO hay controlador todavía: `step()` avanza la física con el brazo
-retenido en la pose inicial, y la acción se valida/clipea pero no se aplica
-(el mapeo acción→juntas llega en F2 junto al controlador mink).
+En F2 el `step()` aplica la acción con `vta.controller.ik.TaskSpaceController`
+(mink, 20 Hz) y decima la simulación: la interfaz queda final para el proyecto.
 """
 
 from __future__ import annotations
@@ -28,6 +27,7 @@ import gymnasium
 import mujoco
 import numpy as np
 
+from vta.controller.ik import TaskSpaceController
 from vta.envs import scene_builder as sb
 
 log = logging.getLogger(__name__)
@@ -75,6 +75,7 @@ class PickPlaceEnv(gymnasium.Env):
         self.data: mujoco.MjData | None = None
         self.scene_params: sb.SceneParams | None = None
         self.scene_path: Path | None = None
+        self.controller: TaskSpaceController | None = None
 
         self._renderer: mujoco.Renderer | None = None
         self._decimation = 1
@@ -120,6 +121,7 @@ class PickPlaceEnv(gymnasium.Env):
         )
         self._resolve_indices()
         self._decimation = max(1, round(1.0 / (CONTROL_HZ * float(self.model.opt.timestep))))
+        self.controller = TaskSpaceController(self.model, self.data)
 
         if self._renderer is not None:
             self._renderer.close()
@@ -133,12 +135,13 @@ class PickPlaceEnv(gymnasium.Env):
         return self._build_obs(), info
 
     def step(self, action: np.ndarray):
-        """Avanza 1/20 s de simulación. F1: sin controlador (ver docstring del módulo)."""
+        """Avanza 1/20 s: aplica la acción con el controlador (mink IK) y decima la simulación."""
         self._require_loaded()
         act = np.array(action, dtype=np.float32, copy=True)
         if act.shape != self.action_space.shape:
             raise ValueError(f"shape de acción {act.shape}; esperado {self.action_space.shape}")
         np.clip(act, self.action_space.low, self.action_space.high, out=act)
+        self.controller.step(self.data, act)
         for _ in range(self._decimation):
             mujoco.mj_step(self.model, self.data)
         return self._build_obs(), 0.0, False, False, {}

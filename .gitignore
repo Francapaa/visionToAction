@@ -10,9 +10,9 @@ __pycache__/
 # MuJoCo
 MUJOCO_LOG.TXT
 
-# Datos y modelos (no versionados)
-data/
-checkpoints/
+# Datos y modelos (no versionados; solo en la raíz del repo, no en src/)
+/data/
+/checkpoints/
 *.h5
 *.pt
 *.zip
