@@ -1,0 +1,290 @@
+[
+  {
+    "index": 0,
+    "task": "red_a",
+    "scene_id": "seed0000_red_boxa",
+    "scene_xml": "data/scenes/seed0000_red_boxa/scene.xml",
+    "params": {
+      "seed": 0,
+      "cup_color": "red",
+      "target_box": "a",
+      "cup_xyz": [
+        0.3965669736892945,
+        -0.09208531449445188,
+        0.441
+      ],
+      "cup_yaw": 0.25744424357926954,
+      "key_pos": [
+        0.31487487197567615,
+        0.5638864305604904,
+        1.647653346366633
+      ],
+      "key_diffuse": 0.692654310306872,
+      "fill_diffuse": 0.2594244841475998
+    }
+  },
+  {
+    "index": 1,
+    "task": "red_b",
+    "scene_id": "seed0001_red_boxb",
+    "scene_xml": "data/scenes/seed0001_red_boxb/scene.xml",
+    "params": {
+      "seed": 1,
+      "cup_color": "red",
+      "target_box": "b",
+      "cup_xyz": [
+        0.3540193523980873,
+        0.18018547853037414,
+        0.441
+      ],
+      "cup_yaw": 0.9057815605287021,
+      "key_pos": [
+        1.1537845024235194,
+        -0.3387033863811262,
+        1.3539958693835454
+      ],
+      "key_diffuse": 0.7810810375281767,
+      "fill_diffuse": 0.21137987045537418
+    }
+  },
+  {
+    "index": 2,
+    "task": "blue_a",
+    "scene_id": "seed0002_blue_boxa",
+    "scene_xml": "data/scenes/seed0002_blue_boxa/scene.xml",
+    "params": {
+      "seed": 2,
+      "cup_color": "blue",
+      "target_box": "a",
+      "cup_xyz": [
+        0.26894812564476756,
+        -0.08060354263435068,
+        0.441
+      ],
+      "cup_yaw": 5.115931210029399,
+      "key_pos": [
+        0.3827243479215872,
+        0.1801809467381773,
+        1.5371363160870768
+      ],
+      "key_diffuse": 0.5251604293466414,
+      "fill_diffuse": 0.15827199409996023
+    }
+  },
+  {
+    "index": 3,
+    "task": "blue_b",
+    "scene_id": "seed0003_blue_boxb",
+    "scene_xml": "data/scenes/seed0003_blue_boxb/scene.xml",
+    "params": {
+      "seed": 3,
+      "cup_color": "blue",
+      "target_box": "b",
+      "cup_xyz": [
+        0.20912071682883226,
+        -0.10527579736156012,
+        0.441
+      ],
+      "cup_yaw": 5.034555946803014,
+      "key_pos": [
+        0.823945832457931,
+        -0.7305684439672815,
+        1.3598761641418844
+      ],
+      "key_diffuse": 0.6416205192563336,
+      "fill_diffuse": 0.17396083719556177
+    }
+  },
+  {
+    "index": 4,
+    "task": "green_a",
+    "scene_id": "seed0004_green_boxa",
+    "scene_xml": "data/scenes/seed0004_green_boxa/scene.xml",
+    "params": {
+      "seed": 4,
+      "cup_color": "green",
+      "target_box": "a",
+      "cup_xyz": [
+        0.500639075894605,
+        0.004531021125744633,
+        0.441
+      ],
+      "cup_yaw": 6.133920107929199,
+      "key_pos": [
+        0.37275242150604193,
+        0.19324049759105344,
+        1.3258919506263636
+      ],
+      "key_diffuse": 0.7707604827943229,
+      "fill_diffuse": 0.17617917242160427
+    }
+  },
+  {
+    "index": 5,
+    "task": "yellow_b",
+    "scene_id": "seed0005_yellow_boxb",
+    "scene_xml": "data/scenes/seed0005_yellow_boxb/scene.xml",
+    "params": {
+      "seed": 5,
+      "cup_color": "yellow",
+      "target_box": "b",
+      "cup_xyz": [
+        0.4537009940734293,
+        0.12317631589459749,
+        0.441
+      ],
+      "cup_yaw": 3.237885993554064,
+      "key_pos": [
+        0.5572212420793274,
+        -0.8029247357130185,
+        1.330021328471311
+      ],
+      "key_diffuse": 0.6133892821679995,
+      "fill_diffuse": 0.15679127908536677
+    }
+  },
+  {
+    "index": 6,
+    "task": "red_a",
+    "scene_id": "seed0006_red_boxa",
+    "scene_xml": "data/scenes/seed0006_red_boxa/scene.xml",
+    "params": {
+      "seed": 6,
+      "cup_color": "red",
+      "target_box": "a",
+      "cup_xyz": [
+        0.36297587950046073,
+        -0.06269165207466462,
+        0.441
+      ],
+      "cup_yaw": 2.318917858443646,
+      "key_pos": [
+        0.637047089029094,
+        0.8774009823356398,
+        1.4796537635642877
+      ],
+      "key_diffuse": 0.7197295722017973,
+      "fill_diffuse": 0.19949451830781875
+    }
+  },
+  {
+    "index": 7,
+    "task": "red_b",
+    "scene_id": "seed0007_red_boxb",
+    "scene_xml": "data/scenes/seed0007_red_boxb/scene.xml",
+    "params": {
+      "seed": 7,
+      "cup_color": "red",
+      "target_box": "b",
+      "cup_xyz": [
+        0.3925324586455868,
+        0.15888552038783021,
+        0.441
+      ],
+      "cup_yaw": 4.873776931938056,
+      "key_pos": [
+        0.5026864709915326,
+        -0.3597006871597942,
+        1.624132067237757
+      ],
+      "key_diffuse": 0.4521061218262299,
+      "fill_diffuse": 0.2731842627574149
+    }
+  },
+  {
+    "index": 8,
+    "task": "blue_a",
+    "scene_id": "seed0008_blue_boxa",
+    "scene_xml": "data/scenes/seed0008_blue_boxa/scene.xml",
+    "params": {
+      "seed": 8,
+      "cup_color": "blue",
+      "target_box": "a",
+      "cup_xyz": [
+        0.29117057404589064,
+        0.19491073733517023,
+        0.441
+      ],
+      "cup_yaw": 2.002519257611085,
+      "key_pos": [
+        1.009694042238026,
+        0.665813721053189,
+        1.3346508839235165
+      ],
+      "key_diffuse": 0.6251527492491196,
+      "fill_diffuse": 0.20591233546340296
+    }
+  },
+  {
+    "index": 9,
+    "task": "blue_b",
+    "scene_id": "seed0009_blue_boxb",
+    "scene_xml": "data/scenes/seed0009_blue_boxb/scene.xml",
+    "params": {
+      "seed": 9,
+      "cup_color": "blue",
+      "target_box": "b",
+      "cup_xyz": [
+        0.4758847293498288,
+        -0.08527311636497786,
+        0.441
+      ],
+      "cup_yaw": 3.7896915944565217,
+      "key_pos": [
+        0.9997806746281608,
+        0.3889343332864176,
+        1.6492280722943045
+      ],
+      "key_diffuse": 0.7941574596731538,
+      "fill_diffuse": 0.28773564435731436
+    }
+  },
+  {
+    "index": 10,
+    "task": "green_a",
+    "scene_id": "seed0010_green_boxa",
+    "scene_xml": "data/scenes/seed0010_green_boxa/scene.xml",
+    "params": {
+      "seed": 10,
+      "cup_color": "green",
+      "target_box": "a",
+      "cup_xyz": [
+        0.5050405812738517,
+        -0.11692727596834125,
+        0.441
+      ],
+      "cup_yaw": 5.205272730965009,
+      "key_pos": [
+        0.43435391077381824,
+        0.023048309585816718,
+        1.181551762412304
+      ],
+      "key_diffuse": 0.7256145919124524,
+      "fill_diffuse": 0.27626215864684184
+    }
+  },
+  {
+    "index": 11,
+    "task": "yellow_b",
+    "scene_id": "seed0011_yellow_boxb",
+    "scene_xml": "data/scenes/seed0011_yellow_boxb/scene.xml",
+    "params": {
+      "seed": 11,
+      "cup_color": "yellow",
+      "target_box": "b",
+      "cup_xyz": [
+        0.22371386894152787,
+        -0.00028885502395400997,
+        0.441
+      ],
+      "cup_yaw": 3.779325642911732,
+      "key_pos": [
+        0.3258201075347501,
+        -0.6337330477605794,
+        1.6569266137762217
+      ],
+      "key_diffuse": 0.4781682304616787,
+      "fill_diffuse": 0.1694660924098947
+    }
+  }
+]

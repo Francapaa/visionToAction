@@ -7,7 +7,8 @@
 ## 0. Estado actual
 
 - **F0 (setup)** — ✅ cerrada 2026-10-17: venv (Python 3.14) + deps + menagerie + render offscreen validado en Windows (WGL) → `reports/validation/f0_smoke.mp4`.
-- **F1 (escena)** — próxima: mesa + taza + caja + cámaras + randomización + registro de contactos.
+- **F1 (escena)** — ✅ cerrada 2026-10-17: mesa + Panda montado vía `attach` + taza hueca + cajas A/B + cámaras + luces + randomización determinista + registro de contactos → 12 escenas + órbita en `reports/validation/f1/`; `pytest -m smoke` en verde.
+- **F2 (experto + dataset)** — próxima: controlador mink (acción 7D → juntas) + experto por waypoints + collector HDF5 (≥90% de éxito en 30 seeds/tarea).
 - Actualizar esta sección al cerrar cada fase.
 
 ## 1. Qué es este proyecto
