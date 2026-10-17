@@ -1,0 +1,19 @@
+# Entorno virtual
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+
+# Datos y modelos (no versionados)
+data/
+checkpoints/
+*.h5
+*.pt
+*.zip
+
+# Videos: ignorar todos salvo las validaciones chicas de reports/
+*.mp4
+!reports/validation/*.mp4

@@ -1,0 +1,16 @@
+mujoco>=3.16
+torch>=2.9
+torchvision>=0.24
+numpy>=2.0
+opencv-python>=4.10
+mink>=0.1
+gymnasium>=1.2
+imageio>=2.36
+imageio-ffmpeg>=0.5
+h5py>=3.11
+PyYAML>=6.0
+tqdm
+tensorboard>=2.17
+pandas>=2.2
+matplotlib>=3.9
+pytest>=8.2

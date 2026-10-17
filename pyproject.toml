@@ -1,0 +1,14 @@
+[project]
+name = "vta"
+version = "0.0.0"
+description = "Visión→Acción (ATLAS): políticas neuronales que transforman observaciones visuales en acciones robóticas continuas."
+requires-python = ">=3.12"
+# Las dependencias se instalan desde requirements.txt (ver AGENTS.md sección 2).
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "smoke: tests rápidos que deben pasar antes de cada commit (pytest -m smoke, <60 s en total)",
+    "slow: tests lentos (entrenamientos, barridos de seeds del experto)",
+]
+addopts = "-q"
