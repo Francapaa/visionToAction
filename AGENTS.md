@@ -7,7 +7,8 @@
 ## 0. Estado actual
 
 - **F0 (setup)** — ✅ cerrada 2026-10-17: venv (Python 3.14) + deps + menagerie + render offscreen validado en Windows (WGL) → `reports/validation/f0_smoke.mp4`.
-- **F1 (escena)** — próxima: mesa + taza + caja + cámaras + randomización + registro de contactos.
+- **F1 (escena)** — ✅ cerrada 2026-10-17: mesa + Panda montado vía `attach` + taza hueca + cajas A/B + cámaras + luces + randomización determinista + registro de contactos → 12 escenas + órbita en `reports/validation/f1/`; `pytest -m smoke` en verde.
+- **F2 (experto + dataset)** — próxima: controlador mink (acción 7D → juntas) + experto por waypoints + collector HDF5 (≥90% de éxito en 30 seeds/tarea).
 - Actualizar esta sección al cerrar cada fase.
 
 ## 1. Qué es este proyecto
@@ -45,6 +46,7 @@ python -m venv .venv                                  # una sola vez
 .venv\Scripts\python.exe -m pip install -r requirements.txt
 .venv\Scripts\python.exe scripts\smoke_render.py      # F0: render offscreen + video
 .venv\Scripts\python.exe scripts\build_scene.py --random --seed 0   # escena → PNG
+.venv\Scripts\python.exe scripts\view_scene.py --random --seed 0    # viewer interactivo (R: nueva escena, espacio: pausa)
 .venv\Scripts\python.exe scripts\collect_demos.py --tasks red_a,red_b,blue_a,blue_b --n 80 --out data\demos\v1
 .venv\Scripts\python.exe -m pytest -m smoke           # tests rápidos (<60 s)
 .venv\Scripts\python.exe -m pytest                    # suite completa
@@ -62,7 +64,7 @@ visionToAction/
   assets/            # menagerie (subset Panda) — prístino
   scenes/            # plantillas MJCF + overlays propios
   configs/           # YAML por experimento
-  scripts/           # smoke_render, build_scene, collect_demos, train, evaluate, export_dataset
+  scripts/           # smoke_render, build_scene, view_scene, collect_demos, train, evaluate, export_dataset
   src/vta/
     envs/            # Env gymnasium, scene_builder (XML paramétrico), randomización
     controller/      # IK (mink) + mapeo acción normalizada → juntas

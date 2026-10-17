@@ -1,0 +1,45 @@
+# F1 — Configuración de escena (Visión→Acción / ATLAS).
+#
+# Todo lo que la escena randomiza queda acá; el env lo registra en `info` y
+# (en F2) en los attrs del HDF5. Lo consume src/vta/envs/scene_builder.py.
+
+seed: 0
+
+# Altura de la superficie de la mesa: ahí se monta la base del Panda.
+table_top: 0.40
+
+# Taza objetivo (única por episodio; los distractores llegan en F5).
+cup:
+  radius: 0.035        # debe entrar en el gripper del Panda (apertura ~8 cm)
+  half_height: 0.04
+  density: 160         # kg/m^3 → masa ≈ 0.05 kg
+  spawn_gap: 0.001     # altura sobre la mesa al momento del spawn
+
+# Región de spawn de la taza (marco del mundo; la base del robot está en x=0).
+workspace:
+  x: [0.18, 0.52]
+  y: [-0.20, 0.20]
+  yaw: [0.0, 6.283185307179586]
+
+# Paleta de colores de taza. Entrenamiento: red, blue. OOD (G2): green, yellow.
+palette: [red, blue, green, yellow]
+default_color: red
+default_box: a
+
+# Randomización de luces (modo entrenamiento; los modos OOD de G3 se agregan en F5).
+lighting:
+  key:
+    pos_x: [0.30, 1.20]
+    pos_y: [-0.90, 0.90]
+    pos_z: [1.10, 1.70]
+    diffuse: [0.45, 0.85]
+  fill:
+    pos: [0.80, 0.90, 1.20]
+    diffuse: [0.15, 0.30]
+
+# Cámaras: posición fija; miran a un cuerpo estático del workspace (targetbody).
+cameras:
+  cam_scene:
+    pos: [1.35, -0.60, 1.00]
+  cam_top:
+    pos: [0.26, 0.0, 1.55]
