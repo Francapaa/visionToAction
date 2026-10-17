@@ -5,6 +5,17 @@ description = "Visión→Acción (ATLAS): políticas neuronales que transforman 
 requires-python = ">=3.12"
 # Las dependencias se instalan desde requirements.txt (ver AGENTS.md sección 2).
 
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+# Layout src/: una vez `pip install -e .`, `import vta` funciona desde scripts y tests.
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = [
